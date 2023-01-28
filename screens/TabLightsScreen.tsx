@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
 import { StyleSheet, ActivityIndicator } from 'react-native';
 
 import EditScreenInfo from '../components/EditScreenInfo';
@@ -8,31 +8,38 @@ import { RootTabScreenProps } from '../types';
 import { sortBy } from "../common";
 import { LightsApi } from "../hue/LightsApi";
 import { Lights } from "../models/Light";
-import { lights } from "../common/HueState";
+import { lights, poll, update } from "../common/HueState";
 import { grey, yellow } from "../common/Style";
 import { func } from 'prop-types';
 import { getFavoriteArray, toggleFavorite } from "../common/Favorites";
+import { useIsFocused } from '@react-navigation/native';
 
-
-// interface State {
-//   lights?: Lights;
-//   favorites: string[];
-// }
 
 export default function TabLightsScreen() {
 
   const [lightsObj, setLightsObj] = useState<Lights>(lights);
   const [favorites, setFavorites] = useState<string[]>([]);
 
-  async function updateLights(id: string) {
-    await lightsApi.putState(id, { on: !lightsObj[id].state.on });
-
-    const newLightsObject = {...lights};
-    newLightsObject[id].state.on = !lightsObj[id].state.on;
-    setLightsObj( newLightsObject );
-  }
+  const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
 
   const lightsApi = new LightsApi();
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    // trigger rendering when tab changes
+    if (isFocused) {
+      setLightsObj(lights);
+    }
+  }, [isFocused]);
+
+
+  async function updateLights(id: string) {
+    
+    await lightsApi.putState(id, { on: !lightsObj[id].state.on });
+    await update()
+
+    setLightsObj( lights );
+  }
 
   const lightButtons = lightsObj
       ? sortBy(Object.values(lightsObj), "name")

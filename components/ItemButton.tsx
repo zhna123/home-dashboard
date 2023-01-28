@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import AwesomeButton from "react-native-really-awesome-button";
 import { RgbBaseMap, RgbBaseStringMap } from "solarizer/tsc-out/RgbMaps";
-import { blue, yellow } from "../constants/Style";
+import { blue, yellow } from "../common/Style";
 
 export interface Props {
   colorMap: RgbBaseStringMap;
