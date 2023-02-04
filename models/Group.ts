@@ -5,7 +5,7 @@ import { GroupClass, verify as verifyGroupClass } from "./GroupClass";
 import { create as GroupStateCreate, GroupState } from "./GroupState";
 import { Item } from "./Item";
 
-enum Status { ON, OFF, INDETERMINATE }
+export enum Status { ON, OFF, INDETERMINATE }
 
 export interface Group extends Item {
   action: GroupAction;

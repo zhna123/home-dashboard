@@ -11,14 +11,13 @@ import EditScreenInfo from '../components/EditScreenInfo';
 import ItemButton from '../components/ItemButton';
 import { Text, View } from '../components/Themed';
 import { useIsFocused } from '@react-navigation/native';
+import { getFavoriteArray, toggleFavorite } from '../common/Favorites';
 
 
 export default function TabGroupsScreen() {
 
-  const [groupsObj, setGroupsObj] = useState<Groups>(groups);
+  const [groupsObj, setGroupsObj] = useState<Groups>({});
   const [favorites, setFavorites] = useState<string[]>([]);
-  const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
-
 
   const groupsApi = new GroupsApi();
   const isFocused = useIsFocused();
@@ -59,6 +58,9 @@ export default function TabGroupsScreen() {
           break;
         }
     }
+
+    const fvGroups = await getFavoriteArray("favoriteGroups");
+    setFavorites(fvGroups);
   }
 
   function onCreateNewClick() {
@@ -86,7 +88,7 @@ export default function TabGroupsScreen() {
           key={`group-${group.id}`}
           onClick={ () => updateGroups(group.id)}
           // onEditClick={this.onEditClick.bind(this)}
-          // onFavoriteClick={(id: string) => toggleFavorite("favoriteGroups", id)}
+          onFavoriteClick={(id: string) => toggleFavorite("favoriteGroups", id)}
           title={group.name}
           reachable={true}
         />

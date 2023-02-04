@@ -17,10 +17,8 @@ import { useIsFocused } from '@react-navigation/native';
 
 export default function TabLightsScreen() {
 
-  const [lightsObj, setLightsObj] = useState<Lights>(lights);
+  const [lightsObj, setLightsObj] = useState<Lights>({});
   const [favorites, setFavorites] = useState<string[]>([]);
-
-  const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
 
   const lightsApi = new LightsApi();
   const isFocused = useIsFocused();
@@ -39,6 +37,8 @@ export default function TabLightsScreen() {
     await update()
 
     setLightsObj( lights );
+    const fvLights = await getFavoriteArray("favoriteLights");
+    setFavorites( fvLights )
   }
 
   const lightButtons = lightsObj
@@ -50,10 +50,9 @@ export default function TabLightsScreen() {
               id={light.id}
               key={`light-${light.id}`}
               colorMap={light.state.on ? yellow : grey}
-              // onClick={this.onClick.bind(this)}
               onClick = { () => updateLights(light.id) }
               // onEditClick={this.onEditClick.bind(this)}
-              // onFavoriteClick={(id: string) => toggleFavorite("favoriteLights", id)}
+              onFavoriteClick={(id: string) => toggleFavorite("favoriteLights", id)}
               title={light.name}
               reachable={light.state.reachable}
             />

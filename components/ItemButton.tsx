@@ -65,7 +65,7 @@ export default function ItemButton(props: Props) {
           </AwesomeButton>
           {!props.hideEditButton ? <AwesomeButton
             // Edit button
-            onPress={() => this.props.onEditClick(props.id)}
+            onPress={() => props.onEditClick?.(props.id!)}
             backgroundColor={blue.base01}
             backgroundActive={blue.base02}
             backgroundDarker={blue.base03}
@@ -87,7 +87,7 @@ export default function ItemButton(props: Props) {
           </AwesomeButton> : undefined}
           {!props.hideFavoritesButton ? <AwesomeButton
             // Favorite button
-            onPress={() => this.props.onFavoriteClick(props.id)}
+            onPress={() => props.onFavoriteClick?.(props.id!)}
             backgroundColor={props.isFavorite ? yellow.base01 : props.colorMap.base01}
             backgroundActive={props.isFavorite ? yellow.base02 : props.colorMap.base02}
             backgroundDarker={props.isFavorite ? yellow.base03 : props.colorMap.base03}
@@ -113,7 +113,7 @@ export default function ItemButton(props: Props) {
 
 }
 
-function getReachableImage(reachable, buttonDimension) {
+function getReachableImage(reachable: boolean | undefined, buttonDimension: number) {
     if (reachable) {
       return undefined;
     }
