@@ -26,8 +26,8 @@ export class LightsApi {
   }
 
   async searchForNew() {
-    const uri = `${bridgeUri}/lights`;
-    await (await fetch(uri, post)).json();
+    const searchUri = `${bridgeUri}/lights`;
+    await (await fetch(searchUri, post)).json();
   }
 
   async getSome(ids: string[]): Promise<Lights> {

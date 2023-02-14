@@ -4,18 +4,19 @@ import { StyleSheet, ActivityIndicator } from 'react-native';
 import EditScreenInfo from '../components/EditScreenInfo';
 import ItemButton from '../components/ItemButton';
 import { Text, View } from '../components/Themed';
-import { RootTabScreenProps } from '../types';
+import { RootStackParamList, RootTabScreenProps } from '../types';
 import { sortBy } from "../common";
 import { LightsApi } from "../hue/LightsApi";
-import { Lights } from "../models/Light";
+import { Light, Lights } from "../models/Light";
 import { lights, poll, update } from "../common/HueState";
 import { grey, yellow } from "../common/Style";
 import { func } from 'prop-types';
 import { getFavoriteArray, toggleFavorite } from "../common/Favorites";
 import { useIsFocused } from '@react-navigation/native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 
-export default function TabLightsScreen() {
+export default function TabLightsScreen({ route, navigation }: RootTabScreenProps<'Lights'>) {
 
   const [lightsObj, setLightsObj] = useState<Lights>({});
   const [favorites, setFavorites] = useState<string[]>([]);
@@ -41,6 +42,11 @@ export default function TabLightsScreen() {
     setFavorites( fvLights )
   }
 
+  function onEditClick(id: string, name: string, brightness: number, alert: string, on: boolean) {
+    console.log(`Edit light ${name} clicked`);
+    navigation.navigate("LightEditor", { id, name, brightness, alert, on });
+  }
+
   const lightButtons = lightsObj
       ? sortBy(Object.values(lightsObj), "name")
         .map((light) => {
@@ -51,7 +57,7 @@ export default function TabLightsScreen() {
               key={`light-${light.id}`}
               colorMap={light.state.on ? yellow : grey}
               onClick = { () => updateLights(light.id) }
-              // onEditClick={this.onEditClick.bind(this)}
+              onEditClick = { () => onEditClick(light.id, light.name, light.state.bri, light.state.alert, light.state.on) }
               onFavoriteClick={(id: string) => toggleFavorite("favoriteLights", id)}
               title={light.name}
               reachable={light.state.reachable}

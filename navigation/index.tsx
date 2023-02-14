@@ -15,6 +15,7 @@ import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../typ
 import LinkingConfiguration from './LinkingConfiguration';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { View } from '../components/Themed';
+import LightEditor from '../screens/editor/LightEditor';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
   return (
@@ -33,6 +34,9 @@ function RootNavigator() {
     <Stack.Navigator>
       <Stack.Screen name="Root" component={TopTabView} options={{ headerShown: false }} />
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
+      <Stack.Group screenOptions={{ presentation: 'modal' }}>
+        <Stack.Screen name="LightEditor" component={LightEditor} />
+      </Stack.Group>
     </Stack.Navigator>
   );
 }

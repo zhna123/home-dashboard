@@ -81,11 +81,12 @@ export function createSubmittable(payload: Light): Partial<Light> {
 
 enum Status { ON, OFF, INDETERMINATE }
 
-export function getBlinking(light: Light): Status {
-  switch (light.state.alert) {
+export function getBlinking(alert: string): Status {
+  console.log("alert value before " + alert)
+  switch (alert) {
     case Alert.NONE: return Status.OFF;
     case Alert.LSELECT: return Status.ON;
     case Alert.SELECT: return Status.ON;
-    default: throw new Error(`Unknown Alert value: ${light.state.alert}`);
+    default: throw new Error(`Unknown Alert value: ${alert}`);
   }
 }
