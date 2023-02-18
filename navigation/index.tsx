@@ -16,6 +16,7 @@ import LinkingConfiguration from './LinkingConfiguration';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { View } from '../components/Themed';
 import LightEditor from '../screens/editor/LightEditor';
+import GroupEditor from '../screens/editor/GroupEditor';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
   return (
@@ -36,6 +37,7 @@ function RootNavigator() {
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
       <Stack.Group screenOptions={{ presentation: 'modal' }}>
         <Stack.Screen name="LightEditor" component={LightEditor} />
+        <Stack.Screen name="GroupEditor" component={GroupEditor} />
       </Stack.Group>
     </Stack.Navigator>
   );

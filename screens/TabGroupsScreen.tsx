@@ -12,9 +12,10 @@ import ItemButton from '../components/ItemButton';
 import { Text, View } from '../components/Themed';
 import { useIsFocused } from '@react-navigation/native';
 import { getFavoriteArray, toggleFavorite } from '../common/Favorites';
+import { RootTabScreenProps } from '../types';
 
 
-export default function TabGroupsScreen() {
+export default function TabGroupsScreen({ route, navigation }: RootTabScreenProps<'Groups'>) {
 
   const [groupsObj, setGroupsObj] = useState<Groups>({});
   const [favorites, setFavorites] = useState<string[]>([]);
@@ -65,7 +66,12 @@ export default function TabGroupsScreen() {
 
   function onCreateNewClick() {
     console.log(`NEW clicked`);
-    // this.props.navigation.navigate("GroupEditor");
+    navigation.navigate("GroupEditor");
+  }
+
+  function onEditClick(id: string, name: string) {
+    console.log(`Edit group ${name} clicked`);
+    navigation.navigate("GroupEditor", { id, name });
   }
 
   const groupButtons = groupsObj
@@ -87,7 +93,7 @@ export default function TabGroupsScreen() {
           colorMap={colorMap}
           key={`group-${group.id}`}
           onClick={ () => updateGroups(group.id)}
-          // onEditClick={this.onEditClick.bind(this)}
+          onEditClick= { () => onEditClick(group.id, group.name) }
           onFavoriteClick={(id: string) => toggleFavorite("favoriteGroups", id)}
           title={group.name}
           reachable={true}

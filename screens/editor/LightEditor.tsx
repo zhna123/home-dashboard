@@ -20,7 +20,7 @@ import { LightState } from "../../models/LightState";
 export default function LightEditor({ route, navigation }: RootStackScreenProps<'LightEditor'>) {
 
     const {id, name, brightness, alert, on} = route.params;
-
+    // TODO not a good way to init light
     const [light, setLight] = useState<Light>(Object);
 
     const [lightName, setLightName] = useState<string>(name);

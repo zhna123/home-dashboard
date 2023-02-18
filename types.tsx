@@ -18,6 +18,7 @@ declare global {
 export type RootStackParamList = {
   Root: NavigatorScreenParams<RootTabParamList> | undefined;
   LightEditor: {id: string, name: string, brightness: number, alert: string, on: boolean};
+  GroupEditor: {id: string, name: string} | undefined;
   NotFound: undefined;
 };
 
