@@ -7,12 +7,12 @@ import { getStatus, Groups } from "../models/Group";
 import { groups, update } from "../common/HueState";
 import { GroupsApi } from '../hue/GroupsApi';
 
-import EditScreenInfo from '../components/EditScreenInfo';
 import ItemButton from '../components/ItemButton';
 import { Text, View } from '../components/Themed';
 import { useIsFocused } from '@react-navigation/native';
 import { getFavoriteArray, toggleFavorite } from '../common/Favorites';
 import { RootTabScreenProps } from '../types';
+import { Alert } from '../models/Alert';
 
 
 export default function TabGroupsScreen({ route, navigation }: RootTabScreenProps<'Groups'>) {
@@ -32,7 +32,7 @@ export default function TabGroupsScreen({ route, navigation }: RootTabScreenProp
 
   async function updateGroups(id: string) {
 
-    switch (getStatus(groupsObj[id])) {
+    switch (getStatus(groupsObj[id].state.all_on, groupsObj[id].state.any_on)) {
       case Status.ON: {
                         await groupsApi.putAction(id, { on: false }); 
                         await update()
@@ -69,16 +69,16 @@ export default function TabGroupsScreen({ route, navigation }: RootTabScreenProp
     navigation.navigate("GroupEditor");
   }
 
-  function onEditClick(id: string, name: string) {
+  function onEditClick(id: string, name: string, brightness: number, alert: Alert, all_on: boolean, any_on: boolean) {
     console.log(`Edit group ${name} clicked`);
-    navigation.navigate("GroupEditor", { id, name });
+    navigation.navigate("GroupEditor", { id, name, brightness, alert, all_on, any_on });
   }
 
   const groupButtons = groupsObj
   ? sortBy(Object.values(groupsObj), "name")
     .map((group) => {
       let colorMap: RgbBaseStringMap;
-      switch (getStatus(group)) {
+      switch (getStatus(group.state.all_on, group.state.any_on)) {
         case Status.ON: colorMap = yellow; break;
         case Status.OFF: colorMap = grey; break;
         case Status.INDETERMINATE: colorMap = orange; break;
@@ -93,7 +93,8 @@ export default function TabGroupsScreen({ route, navigation }: RootTabScreenProp
           colorMap={colorMap}
           key={`group-${group.id}`}
           onClick={ () => updateGroups(group.id)}
-          onEditClick= { () => onEditClick(group.id, group.name) }
+          onEditClick= { () => onEditClick(group.id, group.name, group.action.bri, 
+            group.action.alert, group.state.all_on, group.state.any_on) }
           onFavoriteClick={(id: string) => toggleFavorite("favoriteGroups", id)}
           title={group.name}
           reachable={true}

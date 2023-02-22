@@ -5,20 +5,32 @@ import { lights, update } from "../../common/HueState";
 import { getStyles } from "../../common/Style";
 import { ScrollView, View } from "../../components/Themed";
 import { GroupsApi } from "../../hue/GroupsApi";
-import { getEmpty, Group } from "../../models/Group";
+import { getBlinking, getEmpty, getStatus, Group } from "../../models/Group";
 import { Lights } from "../../models/Light";
 import { RootStackScreenProps } from "../../types";
+import { getBrightnessSlider } from "./components/BrightnessSlider";
 import { getLightSelector } from "./components/LightSelector";
 import { getTitle } from "./components/Title";
+import { rgbStrings as solarized } from "solarizer";
+import { getStatusToggleRow } from "./components/StatusToggle";
+import { Alert } from "../../models/Alert";
 
 export default function GroupEditor({ route, navigation }: RootStackScreenProps<'GroupEditor'>) {
 
     let id: string = '-1';
     let name: string = '';
+    let brightness: number = 256;
+    let alert = Alert.NONE;
+    let all_on = false;
+    let any_on = false;
 
     if (route.params != undefined) {
         id = route.params.id;
         name = route.params.name;
+        brightness = route.params.brightness;
+        alert = route.params.alert;
+        all_on = route.params.all_on;
+        any_on = route.params.any_on;
     }
 
     const [group, setGroup] = useState<Group>(Object);
@@ -27,17 +39,28 @@ export default function GroupEditor({ route, navigation }: RootStackScreenProps<
     const [lightsObj, setLightsObj] = useState<Lights>({});
     const [newGroup, setNewGroup] = useState<boolean>(false);
 
+    const [groupLights, setGroupLights] = useState<string[]>([])
+    const [groupBrightness, setGroupBrightness] = useState<number>(brightness);
+    const [groupAlert, setGroupAlert] = useState<Alert>(alert);
+    const [groupAllOn, setGroupAllOn] = useState<boolean>(all_on);
+    const [groupAnyOn, setGroupAnyOn] = useState<boolean>(any_on);
+
+
+
     const groupsApi = new GroupsApi();
+    let debouncingBrightness = false;
 
     useEffect(() => {
         (async () => {
             if (id !== "-1") {
                 const grp = await groupsApi.get(id);
                 setGroup(grp)
+                setGroupLights(grp.lights)
                 setLightsObj(lights)
                 setNewGroup(false)
             } else {
                 setGroup(getEmpty())
+                setGroupLights([])
                 setLightsObj(lights)
                 setNewGroup(true)
             }
@@ -46,8 +69,11 @@ export default function GroupEditor({ route, navigation }: RootStackScreenProps<
     
     async function endNameEdit() {
         const grp = {...group, name: groupName}
-        await groupsApi.put(grp);
-        await update();
+
+        if (!newGroup) {
+            await groupsApi.put(grp);
+            await update();
+        }
 
         setGroup(grp);
     }
@@ -69,12 +95,73 @@ export default function GroupEditor({ route, navigation }: RootStackScreenProps<
           
         const grp = {...group, lights: lightsArray}
         await updateGroup(grp);
+        setGroupLights(lightsArray);
     }
 
-    // async function createGroup() {
-    //     await groupsApi.create(group);
-    //     this.props.navigation.navigate("Groups");
-    // }
+    async function createGroup() {
+        await groupsApi.create(group);
+        await update()
+        
+        navigation.goBack()
+    }
+
+    async function deleteGroup() {
+        await groupsApi.delete(group.id);
+        await update()
+        navigation.goBack()
+    }
+
+    async function setBrightness(brightness: number, overrideDebounce: boolean) {
+
+        if (!debouncingBrightness || overrideDebounce) {
+          debouncingBrightness = true;
+          const newAction = {...group.action, bri: brightness}
+          const newGrp = {...group, action: newAction}
+
+          if (!newGroup) {
+            groupsApi.putAction(id, { bri: brightness });
+            update()
+          }
+
+          setGroupBrightness(brightness)
+          setGroup(newGrp);         
+          setTimeout(() => debouncingBrightness = false, 500);
+        }
+    }
+
+    async function toggleAlert(alert: boolean) {
+        let newAlert: Alert;
+        if (alert) {
+          newAlert = Alert.LSELECT;
+        } else {
+          newAlert = Alert.NONE;
+        }
+        const newAction = {...group.action, alert: newAlert }
+        const newGrp = {...group, action: newAction}
+
+        if (!newGroup) {
+            await groupsApi.putAction(id, {alert: newAlert});
+            await update()
+        }
+
+        setGroupAlert(newAlert);
+        setGroup(newGrp)
+    }
+
+    async function toggleOn(on: boolean) {
+        const newAction = {...group.action, on: on};
+        const newGrp = {...group, action: newAction}
+
+        if (!newGroup) {
+            await groupsApi.putAction(id, {on: on});
+            await update()
+        }
+
+        const grp = await groupsApi.get(id);
+        setGroup(grp)
+        setGroupAllOn(grp.state.all_on)
+        setGroupAnyOn(grp.state.any_on)
+    }
 
     const styles = getStyles();
     const getView = () =>
@@ -91,7 +178,7 @@ export default function GroupEditor({ route, navigation }: RootStackScreenProps<
                 backgroundDarker={styles.red.base03}
                 textColor={styles.red.base1}
                 height={styles.buttonHeight / 2}
-                // onPress={() => this.deleteGroup()}
+                onPress={() => deleteGroup()}
               >{` DELETE `}</AwesomeButton>
               {getTitle(
                 "Group",
@@ -101,14 +188,14 @@ export default function GroupEditor({ route, navigation }: RootStackScreenProps<
                 setGroupName)}
               {
                 getLightSelector(
-                  group.lights,
+                  groupLights,
                   Object.values(lightsObj),
                   toggleLightSelection,
                 )
               }
-              {/* {getBrightnessSlider(
-                this.state.group.action.bri,
-                this.setBrightness.bind(this),
+              {getBrightnessSlider(
+                groupBrightness,
+                setBrightness,
                 solarized,
               )}
               {
@@ -125,10 +212,10 @@ export default function GroupEditor({ route, navigation }: RootStackScreenProps<
                     turnOnText: "Start",
                     turnOffText: "Stop",
                     turnOnBaseColor: solarized.yellow,
-                    turnOffBaseColor: solarized.base01,
+                    turnOffBaseColor: solarized.red,
                   },
-                  () => getBlinking(this.state.group),
-                  this.toggleAlert.bind(this),
+                  () => getBlinking(groupAlert),
+                  toggleAlert,
                 )
               }
               {
@@ -147,13 +234,13 @@ export default function GroupEditor({ route, navigation }: RootStackScreenProps<
                     turnOnText: "Turn On",
                     turnOffText: "Turn Off",
                     turnOnBaseColor: solarized.yellow,
-                    turnOffBaseColor: solarized.base01,
+                    turnOffBaseColor: solarized.red,
                   },
-                  () => getStatus(this.state.group),
-                  this.toggleOn.bind(this),
+                  () => getStatus(groupAllOn, groupAnyOn),
+                  toggleOn,
                 )
-              } */}
-              {/* {
+              }
+              {
                 newGroup ?
                   <AwesomeButton
                     style={{
@@ -170,7 +257,7 @@ export default function GroupEditor({ route, navigation }: RootStackScreenProps<
                   >
                     {` Create `}
                   </AwesomeButton> : undefined
-              } */}
+              }
             </View>
           </ScrollView>
         </View >

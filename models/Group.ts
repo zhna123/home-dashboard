@@ -52,19 +52,19 @@ export function createSubmittable(payload: Group): Partial<Group> {
   return group;
 }
 
-export function getStatus(group: Group): Status {
-  if (!group.state.any_on) { return Status.OFF; }
-  if (group.state.all_on) { return Status.ON; }
-  if (group.state.any_on) { return Status.INDETERMINATE; }
-  throw new Error(`Unable to generate status value from group state: ${JSON.stringify(group.state, null, 2)}`);
+export function getStatus(allOn: boolean, anyOn: boolean): Status {
+  if (!anyOn) { return Status.OFF; }
+  if (allOn) { return Status.ON; }
+  if (anyOn) { return Status.INDETERMINATE; }
+  throw new Error(`Unable to generate status value from group state - allOn: ${JSON.stringify(allOn)}, anyOn: ${JSON.stringify(anyOn)}`);
 }
 
-export function getBlinking(group: Group): Status {
-  switch (group.action.alert) {
+export function getBlinking(alert: Alert): Status {
+  switch (alert) {
     case Alert.NONE: return Status.OFF;
     case Alert.LSELECT: return Status.ON;
     case Alert.SELECT: return Status.ON;
-    default: throw new Error(`Unknown Alert value: ${group.action.alert}`);
+    default: throw new Error(`Unknown Alert value: ${alert}`);
   }
 }
 

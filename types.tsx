@@ -7,7 +7,7 @@ import { MaterialTopTabScreenProps } from '@react-navigation/material-top-tabs';
 
 import { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Light } from './models/Light';
+import { Alert } from './models/Alert';
 
 declare global {
   namespace ReactNavigation {
@@ -18,7 +18,7 @@ declare global {
 export type RootStackParamList = {
   Root: NavigatorScreenParams<RootTabParamList> | undefined;
   LightEditor: {id: string, name: string, brightness: number, alert: string, on: boolean};
-  GroupEditor: {id: string, name: string} | undefined;
+  GroupEditor: {id: string, name: string, brightness: number, alert: Alert, all_on: boolean, any_on: boolean} | undefined;
   NotFound: undefined;
 };
 
