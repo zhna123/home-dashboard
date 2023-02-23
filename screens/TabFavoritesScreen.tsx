@@ -7,17 +7,17 @@ import { getFavoriteArray, toggleFavorite } from '../common/Favorites';
 import { groups, lights, update } from '../common/HueState';
 import { grey, orange, yellow } from '../common/Style';
 
-import EditScreenInfo from '../components/EditScreenInfo';
 import ItemButton from '../components/ItemButton';
 import { Text, View } from '../components/Themed';
 import { GroupsApi } from '../hue/GroupsApi';
 import { LightsApi } from '../hue/LightsApi';
+import { Alert } from '../models/Alert';
 import { getStatus, Groups, Status } from '../models/Group';
 import { Lights } from '../models/Light';
 import { Type, verify } from '../models/Type';
 import { RootTabScreenProps } from '../types';
 
-export default function TabFavoritesScreen() {
+export default function TabFavoritesScreen({ route, navigation }: RootTabScreenProps<'Favorites'>) {
 
   const [favoriteLights, setFavoriteLights] = useState<string[]>([]);
   const [favoriteGroups, setFavoriteGroups] = useState<string[]>([]);
@@ -52,7 +52,7 @@ export default function TabFavoritesScreen() {
     const id = typeAndId[1];
     switch (type) {
       case Type.GROUP:
-        switch (getStatus(groupsObj[id])) {
+        switch (getStatus(groupsObj[id].state.all_on, groupsObj[id].state.any_on)) {
           case Status.ON: await groupsApi.putAction(id, { on: false }); break;
           case Status.OFF: await groupsApi.putAction(id, { on: true }); break;
           case Status.INDETERMINATE: await groupsApi.putAction(id, { on: true }); break;
@@ -96,6 +96,14 @@ export default function TabFavoritesScreen() {
     }
   }
 
+  function onGroupEditClick(id: string, name: string, brightness: number, alert: Alert, all_on: boolean, any_on: boolean) {
+    navigation.navigate("GroupEditor", { id, name, brightness, alert, all_on, any_on });
+  }
+
+  function onLightEditClick(id: string, name: string, brightness: number, alert: string, on: boolean) {
+    navigation.navigate("LightEditor", { id, name, brightness, alert, on });
+  }
+
   const lightButtons = lightsObj
     ? sortBy(Object.values(lightsObj), "name")
       .filter((light) => favoriteLights.includes(light.id))
@@ -107,7 +115,7 @@ export default function TabFavoritesScreen() {
             key={`light-${light.id}`}
             colorMap={light.state.on ? yellow : grey}
             onClick={() => onClick(`${Type.LIGHT}的${light.id}`)}
-            // onEditClick={this.onEditClick.bind(this)}
+            onEditClick={() => onLightEditClick(light.id, light.name, light.state.bri, light.state.alert, light.state.on)}
             onFavoriteClick={() => onFavoriteClick(`${Type.LIGHT}的${light.id}`)}
             title={light.name}
             reachable={light.state.reachable}
@@ -120,7 +128,7 @@ export default function TabFavoritesScreen() {
         .filter((group) => favoriteGroups.includes(group.id))
         .map((group) => {
           let colorMap: RgbBaseStringMap;
-          switch (getStatus(group)) {
+          switch (getStatus(group.state.all_on, group.state.any_on)) {
             case Status.ON: colorMap = yellow; break;
             case Status.OFF: colorMap = grey; break;
             case Status.INDETERMINATE: colorMap = orange; break;
@@ -135,7 +143,7 @@ export default function TabFavoritesScreen() {
               colorMap={colorMap}
               key={`group-${group.id}`}
               onClick={() => onClick(`${Type.GROUP}的${group.id}`)}
-              // onEditClick={this.onEditClick.bind(this)}
+              onEditClick={() => onGroupEditClick(group.id, group.name, group.action.bri, group.action.alert, group.state.all_on, group.state.any_on)}
               onFavoriteClick={() => onFavoriteClick(`${Type.GROUP}的${group.id}`)}
               title={group.name}
               reachable={true}
@@ -157,7 +165,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     flexDirection: "row",
     justifyContent: "space-around",
-    backgroundColor: "#002b36",
+    // backgroundColor: "#002b36",
     flex: 1,
   },
 });

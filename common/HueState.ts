@@ -21,7 +21,7 @@ export async function poll() {
   await update();
   setTimeout(() => {
     poll();
-  }, 500);
+  }, 5000);
 }
 
 export async function update() {

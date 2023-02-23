@@ -45,8 +45,6 @@ export default function GroupEditor({ route, navigation }: RootStackScreenProps<
     const [groupAllOn, setGroupAllOn] = useState<boolean>(all_on);
     const [groupAnyOn, setGroupAnyOn] = useState<boolean>(any_on);
 
-
-
     const groupsApi = new GroupsApi();
     let debouncingBrightness = false;
 

@@ -1,19 +1,16 @@
 import React, { useState, useEffect, useReducer } from 'react';
 import { StyleSheet, ActivityIndicator } from 'react-native';
 
-import EditScreenInfo from '../components/EditScreenInfo';
 import ItemButton from '../components/ItemButton';
 import { Text, View } from '../components/Themed';
-import { RootStackParamList, RootTabScreenProps } from '../types';
+import { RootTabScreenProps } from '../types';
 import { sortBy } from "../common";
 import { LightsApi } from "../hue/LightsApi";
-import { Light, Lights } from "../models/Light";
-import { lights, poll, update } from "../common/HueState";
+import { Lights } from "../models/Light";
+import { lights, update } from "../common/HueState";
 import { grey, yellow } from "../common/Style";
-import { func } from 'prop-types';
 import { getFavoriteArray, toggleFavorite } from "../common/Favorites";
 import { useIsFocused } from '@react-navigation/native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 
 export default function TabLightsScreen({ route, navigation }: RootTabScreenProps<'Lights'>) {
@@ -89,6 +86,6 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     flexDirection: "row",
     justifyContent: "space-around",
-    backgroundColor: "#002b36",
+    // backgroundColor: "#002b36",
   },
 });

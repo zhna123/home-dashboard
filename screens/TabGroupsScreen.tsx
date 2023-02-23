@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     flexDirection: "row",
     justifyContent: "space-around",
-    backgroundColor: "#002b36",
+    // backgroundColor: "#002b36",
     flex: 1,
   },
 });
