@@ -25,13 +25,14 @@ export async function poll() {
 }
 
 export async function update() {
-  const groupsPromise = groupsApi.getAll();
-  const lightsPromise = lightsApi.getAll();
 //   const sensorsPromise = sensorsApi.getAll();
 //   const rulesPromise = rulesApi.getAll();
-  groups = await groupsPromise;
-  lights = await lightsPromise;
-
+  try {
+    groups = await groupsApi.getAll();;
+    lights = await lightsApi.getAll();
+  } catch (err) {
+    alert(err)
+  }
 //   sensors = await sensorsPromise;
 //   rules = await rulesPromise;
 }

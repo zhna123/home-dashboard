@@ -22,10 +22,14 @@ export default function TabLightsScreen({ route, navigation }: RootTabScreenProp
   const isFocused = useIsFocused();
 
   useEffect(() => {
-    // trigger rendering when tab changes
-    if (isFocused) {
-      setLightsObj(lights);
-    }
+    (async () => {
+      await update()
+      // trigger rendering when tab changes
+      if (isFocused) {
+        setLightsObj(lights);
+      }
+    })()
+    
   }, [isFocused]);
 
 

@@ -7,8 +7,14 @@ import { createSubmittable as createSubmittableLightState, LightState } from "..
 export class LightsApi {
 
   async getAll(): Promise<Lights> {
-    const uri = `${bridgeUri}/lights/`;
-    let lightsMap = await (await fetch(uri, get)).json();
+    let lightsMap;
+    let uri;
+    try {
+      uri = `${bridgeUri}/lights/`;
+      lightsMap = await (await fetch(uri, get)).json();
+    } catch (err) {
+      alert(err + ' bridge uri: ' + uri)
+    }
     lightsMap = this.attachId(lightsMap);
     return lightsMap;
   }

@@ -24,10 +24,13 @@ export default function TabGroupsScreen({ route, navigation }: RootTabScreenProp
   const isFocused = useIsFocused();
 
   useEffect(() => {
-    // this is needed to trigger rendering when tab changes
-    if (isFocused) {
-      setGroupsObj(groups);
-    }
+    (async () => {
+      await update();
+      // this is needed to trigger rendering when tab changes
+      if (isFocused) {
+        setGroupsObj(groups);
+      }
+    })()
   }, [isFocused]);
 
   async function updateGroups(id: string) {

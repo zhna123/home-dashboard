@@ -8,3 +8,6 @@ It is created with Expo typescript template:
 
 ## Running & Testing
 `npx expo start`
+
+## Build
+https://docs.expo.dev/build/setup/

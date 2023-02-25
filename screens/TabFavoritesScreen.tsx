@@ -31,19 +31,20 @@ export default function TabFavoritesScreen({ route, navigation }: RootTabScreenP
   const groupsApi = new GroupsApi();
 
   useEffect(() => {
-
-    // trigger rendering when tab changes
-    if (isFocused) {
-      setLightsObj(lights);
-      setGroupsObj(groups);
-      (async () => {
-        const fvLights = await getFavoriteArray("favoriteLights");
-        setFavoriteLights(fvLights);
-        const fvGroups = await getFavoriteArray("favoriteGroups");
-        setFavoriteGroups(fvGroups);
-      })();
-
-    }
+    (async () => {
+      await update()
+      // trigger rendering when tab changes
+      if (isFocused) {
+        setLightsObj(lights);
+        setGroupsObj(groups);
+        (async () => {
+          const fvLights = await getFavoriteArray("favoriteLights");
+          setFavoriteLights(fvLights);
+          const fvGroups = await getFavoriteArray("favoriteGroups");
+          setFavoriteGroups(fvGroups);
+        })();
+      }
+    })()
   }, [isFocused]);
 
   async function onClick(typeAndIdString: string) {
