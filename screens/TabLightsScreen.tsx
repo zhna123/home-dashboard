@@ -27,11 +27,13 @@ export default function TabLightsScreen({ route, navigation }: RootTabScreenProp
       // trigger rendering when tab changes
       if (isFocused) {
         setLightsObj(lights);
+
+        const fvLights = await getFavoriteArray("favoriteLights");
+        setFavorites(fvLights);
       }
     })()
     
   }, [isFocused]);
-
 
   async function updateLights(id: string) {
     
@@ -39,13 +41,18 @@ export default function TabLightsScreen({ route, navigation }: RootTabScreenProp
     await update()
 
     setLightsObj( lights );
-    const fvLights = await getFavoriteArray("favoriteLights");
-    setFavorites( fvLights )
   }
 
   function onEditClick(id: string, name: string, brightness: number, alert: string, on: boolean) {
     console.log(`Edit light ${name} clicked`);
     navigation.navigate("LightEditor", { id, name, brightness, alert, on });
+  }
+
+  async function onFavoriteClick(id: string) {
+    await toggleFavorite("favoriteLights", id);
+
+    const fvLights = await getFavoriteArray("favoriteLights");
+    setFavorites(fvLights);
   }
 
   const lightButtons = lightsObj
@@ -59,7 +66,7 @@ export default function TabLightsScreen({ route, navigation }: RootTabScreenProp
               colorMap={light.state.on ? yellow : grey}
               onClick = { () => updateLights(light.id) }
               onEditClick = { () => onEditClick(light.id, light.name, light.state.bri, light.state.alert, light.state.on) }
-              onFavoriteClick={(id: string) => toggleFavorite("favoriteLights", id)}
+              onFavoriteClick={() => onFavoriteClick(light.id)}
               title={light.name}
               reachable={light.state.reachable}
             />

@@ -62,7 +62,7 @@ function TopTabNavigator() {
 
   return (
     <TopTab.Navigator
-      initialRouteName="Lights"
+      initialRouteName="Favorites"
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme].tint,
       }}>

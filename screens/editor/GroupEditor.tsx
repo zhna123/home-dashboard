@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ActivityIndicator } from "react-native";
+import { ActivityIndicator, Alert as NativeAlert } from "react-native";
 import AwesomeButton from "react-native-really-awesome-button";
 import { lights, update } from "../../common/HueState";
 import { getStyles } from "../../common/Style";
@@ -109,6 +109,17 @@ export default function GroupEditor({ route, navigation }: RootStackScreenProps<
         navigation.goBack()
     }
 
+    const deleteAlert = () => {
+      NativeAlert.alert('', 'Delete Group?', [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {text: 'Delete', onPress: () => deleteGroup()},
+      ]);
+    }
+
     async function setBrightness(brightness: number, overrideDebounce: boolean) {
 
         if (!debouncingBrightness || overrideDebounce) {
@@ -176,7 +187,7 @@ export default function GroupEditor({ route, navigation }: RootStackScreenProps<
                 backgroundDarker={styles.red.base03}
                 textColor={styles.red.base1}
                 height={styles.buttonHeight / 2}
-                onPress={() => deleteGroup()}
+                onPress={() => deleteAlert()}
               >{` DELETE `}</AwesomeButton>
               {getTitle(
                 "Group",

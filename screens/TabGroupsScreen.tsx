@@ -29,6 +29,9 @@ export default function TabGroupsScreen({ route, navigation }: RootTabScreenProp
       // this is needed to trigger rendering when tab changes
       if (isFocused) {
         setGroupsObj(groups);
+
+        const fvGroups = await getFavoriteArray("favoriteGroups");
+        setFavorites(fvGroups);
       }
     })()
   }, [isFocused]);
@@ -62,9 +65,6 @@ export default function TabGroupsScreen({ route, navigation }: RootTabScreenProp
           break;
         }
     }
-
-    const fvGroups = await getFavoriteArray("favoriteGroups");
-    setFavorites(fvGroups);
   }
 
   function onCreateNewClick() {
@@ -75,6 +75,13 @@ export default function TabGroupsScreen({ route, navigation }: RootTabScreenProp
   function onEditClick(id: string, name: string, brightness: number, alert: Alert, all_on: boolean, any_on: boolean) {
     console.log(`Edit group ${name} clicked`);
     navigation.navigate("GroupEditor", { id, name, brightness, alert, all_on, any_on });
+  }
+
+  async function onFavoriteClick(id: string) {
+    await toggleFavorite("favoriteGroups", id);
+
+    const fvGroups = await getFavoriteArray("favoriteGroups");
+    setFavorites(fvGroups);
   }
 
   const groupButtons = groupsObj
@@ -98,7 +105,7 @@ export default function TabGroupsScreen({ route, navigation }: RootTabScreenProp
           onClick={ () => updateGroups(group.id)}
           onEditClick= { () => onEditClick(group.id, group.name, group.action.bri, 
             group.action.alert, group.state.all_on, group.state.any_on) }
-          onFavoriteClick={(id: string) => toggleFavorite("favoriteGroups", id)}
+          onFavoriteClick={() => onFavoriteClick(group.id)}
           title={group.name}
           reachable={true}
         />

@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import AwesomeButton from "react-native-really-awesome-button";
 import { RgbBaseMap, RgbBaseStringMap } from "solarizer/tsc-out/RgbMaps";
-import { blue, yellow } from "../common/Style";
+import { blue, yellow, grey } from "../common/Style";
 
 export interface Props {
   colorMap: RgbBaseStringMap;
@@ -88,9 +88,9 @@ export default function ItemButton(props: Props) {
           {!props.hideFavoritesButton ? <AwesomeButton
             // Favorite button
             onPress={() => props.onFavoriteClick?.(props.id!)}
-            backgroundColor={props.isFavorite ? yellow.base01 : props.colorMap.base01}
-            backgroundActive={props.isFavorite ? yellow.base02 : props.colorMap.base02}
-            backgroundDarker={props.isFavorite ? yellow.base03 : props.colorMap.base03}
+            backgroundColor={props.isFavorite ? yellow.base01 : grey.base01}
+            backgroundActive={props.isFavorite ? yellow.base02 : grey.base02}
+            backgroundDarker={props.isFavorite ? yellow.base03 : grey.base03}
             textColor={yellow.base1}
             style={{
               width: buttonDimension / 3,
